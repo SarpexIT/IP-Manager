@@ -16,9 +16,19 @@
 
 namespace SarpexIT\IPManager\Setup;
 
+/**
+ * Setup class for handling setup requests
+ */
 class Setup
 {
+    /**
+     * Path to directory containing language files
+     */
     private const DEFAULT_LNG_DIR = __DIR__ . '/../../_lng';
+
+    /**
+     * @var string $statusFile Path to default setup configuration file
+     */
     private string $statusFile = __DIR__ . '/../../_setup/data/setup.ini';
 
     /**
@@ -30,7 +40,11 @@ class Setup
         if (!is_null($statusFile)) $this->statusFile = $statusFile;
     }
 
-
+    /**
+     * Gets all languages and their language files as array
+     * @param string|null $lngDir Directory to search language files in
+     * @return array|false Array containing all languages and their files. On error: false
+     */
     public function getSetupLanguages(?string $lngDir = null): array|false
     {
         $lngDir = is_null($lngDir) ? self::DEFAULT_LNG_DIR : $lngDir;
@@ -50,7 +64,13 @@ class Setup
         return $lngs;
     }
 
-    public function setSetupProperty(string $section, string $property, mixed $value)
+    /**
+     * Sets a value for an configuration property
+     * @param string $section Configuration section as string
+     * @param string $property Configuration property as string
+     * @param mixed $value Configuration value
+     */
+    public function setSetupProperty(string $section, string $property, mixed $value): void
     {
         $config_data = parse_ini_file($this->statusFile, true);
         $config_data[$section][$property] = ($value == false) ? "0" : $value;
@@ -65,16 +85,24 @@ class Setup
         file_put_contents($this->statusFile, $new_content);
     }
 
+    /**
+     * Gets the value of a configuration property
+     * @param string $section Configuration section as string
+     * @param string $property Configuration property as string
+     * @return mixed Mixed configuration value
+     */
     public function getSetupProperty(string $section, string $property): mixed
     {
         $data = parse_ini_file($this->statusFile, true);
         return $data[$section][$property];
     }
 
+    /**
+     * Exits the setup and denies the access tu the setup helper
+     */
     public function exitSetup()
     {
         $this->setSetupProperty("status", "finished", true);
         header("Location: ../");
     }
-
 }
